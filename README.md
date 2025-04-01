@@ -1,1 +1,0 @@
-# opella-devops-challenge

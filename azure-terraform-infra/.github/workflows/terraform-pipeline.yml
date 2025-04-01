@@ -1,0 +1,105 @@
+name: 'Terraform CI/CD'
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+env:
+  TF_LOG: INFO
+
+jobs:
+  terraform:
+    name: 'Terraform'
+    runs-on: ubuntu-latest
+    environment: ${{ github.event_name == 'pull_request' && 'development' || 'production' }}
+    
+    #  GitHub Actions runner is ubuntu-latest use Bash as the shell
+    defaults:
+      run:
+        shell: bash
+        # working directory to the development environment for pull requests, production for pushes to main
+        working-directory: ${{ github.event_name == 'pull_request' && './environments/dev' || './environments/prod' }}
+
+    steps:
+    # Checkout the repository to the GitHub Actions runner
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    # Install the latest version of Terraform CLI
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_version: 1.10.2
+
+    # Authentication to Azure via Service Principal
+    - name: 'Az CLI login'
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+        enable-AzPSSession: true
+
+    # Initialize a new or existing Terraform working directory
+    - name: Terraform Init
+      id: init
+      run: terraform init
+
+    # formatting tf files
+    - name: Terraform Format
+      id: fmt
+      run: terraform fmt -check
+      continue-on-error: true
+
+    # Validate Terraform configuration
+    - name: Terraform Validate
+      id: validate
+      run: terraform validate
+
+    # Generate Terraform plan
+    - name: Terraform Plan
+      id: plan
+      if: github.event_name == 'pull_request'
+      run: terraform plan -no-color
+      continue-on-error: false
+
+    # Add a comment to pull requests with plan output
+    - name: Add Plan Comment
+      uses: actions/github-script@v6
+      if: github.event_name == 'pull_request'
+      env:
+        PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome == 'success' && '✅' || '❌' }}\`
+          #### Terraform Initialization ⚙️\`${{ steps.init.outcome == 'success' && '✅' || '❌' }}\`
+          #### Terraform Validation 🤖\`${{ steps.validate.outcome == 'success' && '✅' || '❌' }}\`
+          #### Terraform Plan 📖\`${{ steps.plan.outcome == 'success' && '✅' || '❌' }}\`
+
+          <details><summary>Show Plan</summary>
+
+          \`\`\`\n
+          ${process.env.PLAN}
+          \`\`\`
+
+          </details>
+
+          *Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
+
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: output
+          })
+
+    # Apply Terraform changes (only on push to main or manual trigger)
+    - name: Terraform Apply
+      if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+      run: terraform apply -auto-approve
