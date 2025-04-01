@@ -6,49 +6,6 @@
 
 This repository contains Terraform code for deploying modular, reusable Azure infrastructure, following Infrastructure as Code (IaC) best practices. The solution focuses on creating a flexible VNET architecture that can be used across multiple environments.
 
-## Project Structure
-
-azure-terraform-infra/
-│
-├── modules/
-│   ├── opella-dev-vnet/ 
-│   │   ├── main.tf
-│   │   ├── variables.tf
-│   │   ├── outputs.tf
-│   │   └── opella-dev-vnet.tf
-│   │
-│   ├── compute/          
-│   │   ├── main.tf
-│   │   ├── variables.tf
-│   │   ├── outputs.tf
-│   │   └── README.md
-│   │
-│   └── storage/             
-│       ├── main.tf
-│       ├── variables.tf
-│       ├── outputs.tf
-│       └── README.md
-│
-├── environments/
-│   ├── development/
-│   │   ├── main.tf
-│   │   ├── variables.tf
-│   │   ├── dev.tfvars
-│   │   └── outputs.tf
-│   │
-│   └── production/
-│       ├── main.tf
-│       ├── variables.tf
-│       ├── prod.tfvars
-│       └── outputs.tf
-│
-├── .github/
-│   └── workflows/
-│       └── terraform-pipeline.yml
-│
-├── .gitignore
-└── README.md
-
 ## Modules
 
 ### opella-dev-vnet Module
