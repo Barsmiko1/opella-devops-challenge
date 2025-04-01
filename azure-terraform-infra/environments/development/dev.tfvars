@@ -1,4 +1,4 @@
-subscription_id     = "9ee4732b-43be-4a49-9c51-098d964fb788"
+subscription_id     = "9ee473xx-xxxxx-4a49-9c51-xxxxxx8"
 resource_group_name = "rg-opella-dev"
 location            = "eastus"
 vnet_name           = "opella-dev-vnet"
@@ -52,7 +52,7 @@ nat_gateway_subnet_names = ["web-subnet", "app-subnet"]
 
 # Opella VM Configuration
 admin_username = "opellaadmin"
-admin_ssh_key  = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCzep1DcBJZTVfOv9zX+fdbl2DreMQGA8TBxyhSYToxj4Xd2b7fkxeYX2qXcZ+PBXTiEWltmpBGN/wOmkPxUf5iLRUauFtpHlxuBU9eLKKK3DMaDwmyzbWXUKP6DenFet2wgfnC5VRrHnZeTnrcoJyGI5UWtLiQESZ1eqOSH2uGRkhpCek/8yr1iHQfs5A4NPqGztGmgXgy2UagUMRTzQRiBQzAl43zOZdhh/UtQBgS3dhMlUC3DGfISX5x3p9pfYxWhWm8htBTvuRj8X4BWg1Sb4Jxp1img4Rhpwp29D3VjUn6VH3xlFnJUBeDTmiG4fmTtt4T+dWllhoNY7i0bVvT michael-mac-pro"
+admin_ssh_key  = ""
 
 # Opella Web VM Configuration
 web_vm_name          = "opella-web-vm"
